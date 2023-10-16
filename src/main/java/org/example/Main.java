@@ -5,6 +5,7 @@ package org.example;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.HttpCookie;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 
@@ -13,35 +14,16 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import db.db;
+import db.bookDB;
 import db.book;
 import com.sun.net.httpserver.*;
 
 public class Main {
 
     public static void main(String[] args)throws Exception {
-       /* ArrayList<book> books = new ArrayList<book>();
-        for(int i=0; i<5; i++){
-            String title = "book " + i;
-            String authorName = "author " + i;
-            int bookID = i;
-            int authorID = i;
-            int pages = 10+i;
-
-            books.add(new book(title, authorName, bookID, authorID, pages));
-        }
-
-        {
-            ObjectMapper mapper = new ObjectMapper();
-            ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
-            writer.writeValue(new File("books.json"), books);
-            String json = mapper.writeValueAsString(books);
-            System.out.println(json);
-        }*/
-
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
-        HttpContext testcontext = server.createContext("/bookstore/Allbooks", new MyHandler());
-
+        HttpContext _books = server.createContext("/bookstore/books", new bookHandler());
+        HttpContext _authors = server.createContext("/bookstore/authors", new authorHandler());
       /*  testcontext.setAuthenticator(new BasicAuthenticator("myrealm") {
             @Override
             public boolean checkCredentials(String user, String pwd) {
@@ -53,19 +35,41 @@ public class Main {
         server.start();
     }
 
-    static class MyHandler implements HttpHandler {
+    static class bookHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
             if("GET".equals(t.getRequestMethod())) {
-                System.out.println(t.getRequestURI());
+                //System.out.println(t.getRequestURI());
                 String response = null;
                 try {
-                    response = db.getAllBooks();
+                    response = bookDB.getAllBooks(t);
                 } catch (Exception e) {
                     System.out.println("Error: " + e);
                     throw new RuntimeException(e);
                 }
-                t.sendResponseHeaders(200, response.length());
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+            else{
+                t.sendResponseHeaders(405,-1);
+            }
+            t.close();
+        }
+    }
+
+    static class authorHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange t) throws IOException {
+            if("GET".equals(t.getRequestMethod())) {
+                //System.out.println(t.getRequestURI());
+                String response = null;
+                try {
+                    response = bookDB.getAllBooks(t);
+                } catch (Exception e) {
+                    System.out.println("Error: " + e);
+                    throw new RuntimeException(e);
+                }
                 OutputStream os = t.getResponseBody();
                 os.write(response.getBytes());
                 os.close();
