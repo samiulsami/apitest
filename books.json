@@ -1,31 +1,43 @@
 [ {
-  "title" : "book 0",
-  "authorName" : "author 0",
+  "title" : "The Great Gatsby",
+  "authorName" : "F. Scott Fitzgerald",
   "bookID" : 0,
-  "pages" : 10,
+  "pages" : 180,
   "authorID" : 0
 }, {
-  "title" : "book 1",
-  "authorName" : "author 1",
+  "title" : "Winter Dreams",
+  "authorName" : "F. Scott Fitzgerald",
   "bookID" : 1,
-  "pages" : 11,
+  "pages" : 29,
+  "authorID" : 0
+}, {
+  "title" : "To Kill a Mockingbird",
+  "authorName" : "Harper Lee",
+  "bookID" : 2,
+  "pages" : 336,
   "authorID" : 1
 }, {
-  "title" : "book 2",
-  "authorName" : "author 2",
-  "bookID" : 2,
-  "pages" : 12,
+  "title" : "1984",
+  "authorName" : "George Orwell",
+  "bookID" : 3,
+  "pages" : 328,
   "authorID" : 2
 }, {
-  "title" : "book 3",
-  "authorName" : "author 3",
-  "bookID" : 3,
-  "pages" : 13,
+  "title" : "Animal Farm",
+  "authorName" : "George Orwell",
+  "bookID" : 4,
+  "pages" : 140,
+  "authorID" : 2
+}, {
+  "title" : "The Lord of the Rings",
+  "authorName" : " J. R. R. Tolkien",
+  "bookID" : 5,
+  "pages" : 1178,
   "authorID" : 3
 }, {
-  "title" : "book 4",
-  "authorName" : "author 4",
-  "bookID" : 4,
-  "pages" : 14,
+  "title" : "Jane Eyre",
+  "authorName" : "Charlotte Bronte",
+  "bookID" : 6,
+  "pages" : 372,
   "authorID" : 4
 } ]

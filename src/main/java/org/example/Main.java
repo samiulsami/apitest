@@ -20,7 +20,7 @@ import com.sun.net.httpserver.*;
 public class Main {
 
     public static void main(String[] args)throws Exception {
-        ArrayList<book> books = new ArrayList<book>();
+       /* ArrayList<book> books = new ArrayList<book>();
         for(int i=0; i<5; i++){
             String title = "book " + i;
             String authorName = "author " + i;
@@ -28,17 +28,16 @@ public class Main {
             int authorID = i;
             int pages = 10+i;
 
-            books.add(new book.Builder().title(title).authorName(authorName).bookID(bookID).authorID(authorID).pages(pages).build());
+            books.add(new book(title, authorName, bookID, authorID, pages));
         }
 
         {
             ObjectMapper mapper = new ObjectMapper();
-            mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
             ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
             writer.writeValue(new File("books.json"), books);
             String json = mapper.writeValueAsString(books);
             System.out.println(json);
-        }
+        }*/
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
         HttpContext testcontext = server.createContext("/bookstore/books", new MyHandler());
@@ -58,7 +57,15 @@ public class Main {
         @Override
         public void handle(HttpExchange t) throws IOException {
             if("GET".equals(t.getRequestMethod())) {
-                String response = db.getAllBooks();
+
+                String response = null;
+                try {
+                    response = db.getAllBooks();
+                } catch (Exception e) {
+                    System.out.println("Error: " + e);
+                    throw new RuntimeException(e);
+                }
+
                 t.sendResponseHeaders(200, response.length());
                 OutputStream os = t.getResponseBody();
                 os.write(response.getBytes());
