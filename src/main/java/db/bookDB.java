@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.sun.net.httpserver.HttpExchange;
@@ -23,9 +24,15 @@ public class bookDB {
         }
     }
 
-    private void serializeBooks(){
+    private static void serializeBooks() throws IOException {
         if(books == null || books.isEmpty())return;
-
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
+        try {
+            writer.writeValue(new File("books.json"), books);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     public static String getAllBooks(HttpExchange t)throws Exception{
         if(books == null || books.isEmpty()){
@@ -38,7 +45,7 @@ public class bookDB {
         return json;
     }
 
-    public static String deleteBook(int bookID, HttpExchange t){
+    public static String deleteBook(int bookID, HttpExchange t)throws Exception{
         String ret = "";
         for(var i:books){
             if(i.bookID == bookID){
@@ -49,7 +56,7 @@ public class bookDB {
             }
         }
 
-        t.sendResponseHeaders(200, -1);
+        t.sendResponseHeaders(204, -1);
         serializeBooks();
         return ret;
     }
