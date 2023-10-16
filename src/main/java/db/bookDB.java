@@ -45,15 +45,34 @@ public class bookDB {
         return json;
     }
 
+    public static String getSingleBook(int bookID, HttpExchange t)throws Exception{
+        if(books == null || books.isEmpty()){
+            t.sendResponseHeaders(204, -1);
+            return "";
+        }
+        String ret = "";
+        for(var i:books) {
+            if(i.bookID != bookID)continue;
+            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+            String json = ow.writeValueAsString(books);
+            t.sendResponseHeaders(200, json.length());
+        }
+        return ret;
+    }
+
     public static String deleteBook(int bookID, HttpExchange t)throws Exception{
+        if(books == null || books.isEmpty()){
+            t.sendResponseHeaders(204, -1);
+            return "";
+        }
         String ret = "";
         for(var i:books){
-            if(i.bookID == bookID){
-                books.remove(i);
-                ret = new String("Book: " + i.title + ", ID: " + bookID + " has been successfully deleted");
-                t.sendResponseHeaders(200, ret.length());
-                return ret;
-            }
+            if(i.bookID != bookID)continue;
+            books.remove(i);
+            ret = new String("Book: " + i.title + ", ID: " + bookID + " has been successfully deleted");
+            t.sendResponseHeaders(200, ret.length());
+            serializeBooks();
+            return ret;
         }
 
         t.sendResponseHeaders(204, -1);

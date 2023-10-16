@@ -38,14 +38,14 @@ public class Main {
     }
 
     private static int getSuffix(String uri){
-        ArrayList<String> slist = new ArrayList<String>(Arrays.asList(uri.split("/",0)));
-        String tmp = slist.get(slist.size() - 1);
+        String[] slist = uri.split("/",0);
+        String tmp = slist[slist.length - 1];
         int num = -1;
 
         try{
             num = Integer.parseInt(tmp);
         }catch(NumberFormatException e){
-
+            System.out.println("Invalid URI Suffix");
         }
 
         return num;
@@ -68,8 +68,15 @@ public class Main {
                 }
                 else{
                     //TODO: Implement function for getting a single book
+                    try {
+                        response = bookDB.getSingleBook(id, t);
+                    } catch (Exception e) {
+                        System.out.println("Error: " + e);
+                        throw new RuntimeException(e);
+                    }
                     System.out.println(id);
                 }
+
                 OutputStream os = t.getResponseBody();
                 os.write(response.getBytes());
                 os.close();
