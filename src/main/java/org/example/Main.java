@@ -8,6 +8,8 @@ import java.io.OutputStream;
 import java.net.HttpCookie;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -35,17 +37,38 @@ public class Main {
         server.start();
     }
 
+    private static int getSuffix(String uri){
+        ArrayList<String> slist = new ArrayList<String>(Arrays.asList(uri.split("/",0)));
+        String tmp = slist.get(slist.size() - 1);
+        int num = -1;
+
+        try{
+            num = Integer.parseInt(tmp);
+        }catch(NumberFormatException e){
+
+        }
+
+        return num;
+    }
     static class bookHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
             if("GET".equals(t.getRequestMethod())) {
                 //System.out.println(t.getRequestURI());
                 String response = null;
-                try {
-                    response = bookDB.getAllBooks(t);
-                } catch (Exception e) {
-                    System.out.println("Error: " + e);
-                    throw new RuntimeException(e);
+                int id = getSuffix(t.getRequestURI().toString());
+
+                if(id == -1) {
+                    try {
+                        response = bookDB.getAllBooks(t);
+                    } catch (Exception e) {
+                        System.out.println("Error: " + e);
+                        throw new RuntimeException(e);
+                    }
+                }
+                else{
+                    //TODO: Implement function for getting a single book
+                    System.out.println(id);
                 }
                 OutputStream os = t.getResponseBody();
                 os.write(response.getBytes());
