@@ -40,7 +40,7 @@ public class Main {
         }*/
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
-        HttpContext testcontext = server.createContext("/bookstore/books", new MyHandler());
+        HttpContext testcontext = server.createContext("/bookstore/Allbooks", new MyHandler());
 
       /*  testcontext.setAuthenticator(new BasicAuthenticator("myrealm") {
             @Override
@@ -57,7 +57,7 @@ public class Main {
         @Override
         public void handle(HttpExchange t) throws IOException {
             if("GET".equals(t.getRequestMethod())) {
-
+                System.out.println(t.getRequestURI());
                 String response = null;
                 try {
                     response = db.getAllBooks();
@@ -65,7 +65,6 @@ public class Main {
                     System.out.println("Error: " + e);
                     throw new RuntimeException(e);
                 }
-
                 t.sendResponseHeaders(200, response.length());
                 OutputStream os = t.getResponseBody();
                 os.write(response.getBytes());
