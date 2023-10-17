@@ -25,8 +25,8 @@ public class Main {
     public static void main(String[] args)throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
         HttpContext _books = server.createContext("/bookstore/books", new bookHandler());
-        HttpContext _authors = server.createContext("/bookstore/authors", new authorHandler());
-      /*  testcontext.setAuthenticator(new BasicAuthenticator("myrealm") {
+      //  HttpContext _authors = server.createContext("/bookstore/authors", new authorHandler());
+       /* _books.setAuthenticator(new BasicAuthenticator("myrealm") {
             @Override
             public boolean checkCredentials(String user, String pwd) {
                 return user.equals("admin") && pwd.equals("admin");
@@ -45,7 +45,7 @@ public class Main {
         try{
             num = Integer.parseInt(tmp);
         }catch(NumberFormatException e){
-            System.out.println("Invalid URI Suffix");
+            //System.out.println("Invalid URI Suffix");
         }
 
         return num;
@@ -54,29 +54,53 @@ public class Main {
         @Override
         public void handle(HttpExchange t) throws IOException {
             if("GET".equals(t.getRequestMethod())) {
-                //System.out.println(t.getRequestURI());
                 String response = null;
                 int id = getSuffix(t.getRequestURI().toString());
 
-                if(id == -1) {
+                if(id < 0) {///Get all books
                     try {
                         response = bookDB.getAllBooks(t);
                     } catch (Exception e) {
-                        System.out.println("Error: " + e);
+                        System.out.println("Error in GET: " + e);
                         throw new RuntimeException(e);
                     }
                 }
-                else{
-                    //TODO: Implement function for getting a single book
+                else{/// Get one book
                     try {
                         response = bookDB.getSingleBook(id, t);
                     } catch (Exception e) {
-                        System.out.println("Error: " + e);
+                        System.out.println("Error in GET: " + e);
                         throw new RuntimeException(e);
                     }
-                    System.out.println(id);
+                   // System.out.println(response);
+                }
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+            else if("DELETE".equals(t.getRequestMethod())){
+                String response = null;
+                int id = getSuffix(t.getRequestURI().toString());
+
+                try {
+                    response = bookDB.deleteBook(id, t);
+                } catch (Exception e) {
+                    System.out.println("Error in DELETE: " + e);
+                    throw new RuntimeException(e);
                 }
 
+                OutputStream os = t.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            }
+            else if("POST".equals(t.getRequestMethod())){
+                String response;
+                try{
+                    response = bookDB.addBook(t);
+                }catch (Exception e){
+                    System.out.println("Error in POST: " + e);
+                    throw new RuntimeException(e);
+                }
                 OutputStream os = t.getResponseBody();
                 os.write(response.getBytes());
                 os.close();
