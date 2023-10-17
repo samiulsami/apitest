@@ -3,6 +3,7 @@ package db;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -24,7 +25,7 @@ public class bookDB {
         }
     }
 
-    private static void serializeBooks() throws IOException {
+    private static void serializeBooks(){
         if(books == null || books.isEmpty())return;
         ObjectMapper mapper = new ObjectMapper();
         ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
@@ -79,11 +80,11 @@ public class bookDB {
             t.sendResponseHeaders(403,ret.length());
             return ret;
         }
-        String ret = "";
+        String ret;
         for(var i:books){
             if(i.bookID != bookID)continue;
             books.remove(i);
-            ret = new String("Book: " + i.title + ", ID: " + bookID + " has been successfully deleted");
+            ret = "Book: " + i.title + ", ID: " + bookID + " has been successfully deleted";
             t.sendResponseHeaders(200, ret.length());
             //serializeBooks();
             return ret;
@@ -94,23 +95,43 @@ public class bookDB {
         return ret;
     }
 
-    public static String addBook(HttpExchange t)throws Exception{
+    ///Attempts to parse a book from given headers
+    ///Returns [book, responseText]
+    private static List<Object> parseBook(HttpExchange t)throws Exception{
+        List<Object> tmp = new ArrayList<>();
         var keys = t.getRequestHeaders();
         //System.out.println(mp.get("dasd").get(0));
         if(!keys.containsKey("title") || !keys.containsKey("authorName") || !keys.containsKey("authorID") || !keys.containsKey("pages")){
             String ret = "One or more required keys are missing from the header";
             ret = ret + "\nRequired keys: \ntitle\nauthorname\nauthorID\npages";
             t.sendResponseHeaders(400, ret.length());
-            return ret;
+            tmp.add(null);
+            tmp.add(ret);
+            return tmp;
         }
+
         String title = keys.get("title").get(0);
         String authorName = keys.get("authorName").get(0);
         int pages = Integer.parseInt(keys.get("pages").get(0));
         int authorID = Integer.parseInt(keys.get("authorID").get(0));
         int bookID = getBookID();
-        books.add(new book(title, authorName, bookID, authorID, pages));
 
-        String ret = "Book: " + title + ", ID: " + bookID + " has been successfully added";
+        tmp.add(new book(title, authorName, bookID, authorID, pages));
+        tmp.add("");
+        return tmp;
+    }
+    public static String addBook(HttpExchange t)throws Exception{
+        book b;
+        String responseText;
+        {
+            List<Object> tmp = parseBook(t);
+            if(tmp.get(0) == null)return (String)tmp.get(1);
+            responseText = (String) tmp.get(1);
+            b = (book) tmp.get(0);
+        }
+
+        books.add(b);
+        String ret = "Book: " + b.title + ", ID: " + b.bookID + " has been successfully added";
         t.sendResponseHeaders(200, ret.length());
         return ret;
     }
