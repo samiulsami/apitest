@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -13,6 +14,7 @@ import com.sun.net.httpserver.HttpExchange;
 
 public class bookDB {
 
+    ///Initialized with the contents of books.json
     public static ArrayList<book> books;
 
     static{
@@ -25,6 +27,7 @@ public class bookDB {
         }
     }
 
+    ///Writes the current elements of "books" into "books.json"
     private static void serializeBooks(){
         if(books == null || books.isEmpty())return;
         ObjectMapper mapper = new ObjectMapper();
@@ -55,22 +58,31 @@ public class bookDB {
         return json;
     }
 
-    public static String getSingleBook(int bookID, HttpExchange t)throws Exception{
+    private static String toJsonFormat(Object b) throws JsonProcessingException {
+        ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+        String json = ow.writeValueAsString(b);
+        return json;
+    }
+    public static String getSingleBook(int bookID)throws Exception{
         if(books == null || books.isEmpty()){
             String ret = "Book not found";
-            t.sendResponseHeaders(403,ret.length());
             return ret;
         }
 
         for(var i:books) {
             if(i.bookID != bookID)continue;
-            ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-            String json = ow.writeValueAsString(i);
-            t.sendResponseHeaders(200, json.length());
-            return json;
+            return toJsonFormat(i);
         }
+
         String ret = "Book not found";
-        t.sendResponseHeaders(403,ret.length());
+        return ret;
+    }
+    public static String getSingleBook(int bookID, HttpExchange t)throws Exception{
+        String ret = getSingleBook(bookID);
+        if(!"Book not found".equals(ret))
+            t.sendResponseHeaders(200,ret.length());
+        else
+            t.sendResponseHeaders(404, ret.length());
         return ret;
     }
 
@@ -96,14 +108,27 @@ public class bookDB {
     }
 
     ///Attempts to parse a book from given headers
-    ///Returns [book, responseText]
+    ///Returns List<Object> {book, responseText}
+    ///book is null if parse failed
+    ///responseText is empty if parse succeeded
     private static List<Object> parseBook(HttpExchange t)throws Exception{
         List<Object> tmp = new ArrayList<>();
         var keys = t.getRequestHeaders();
         //System.out.println(mp.get("dasd").get(0));
-        if(!keys.containsKey("title") || !keys.containsKey("authorName") || !keys.containsKey("authorID") || !keys.containsKey("pages")){
-            String ret = "One or more required keys are missing from the header";
-            ret = ret + "\nRequired keys: \ntitle\nauthorname\nauthorID\npages";
+        String requiredKeys[] = {"title", "authorName", "authorID", "pages"};
+        List<String> missingKeys = new ArrayList<String>();
+
+        for(var k:requiredKeys){
+            if(!keys.containsKey(k)) {
+                missingKeys.add(k);
+            }
+        }
+
+        if(!missingKeys.isEmpty()){
+            String ret = "Failed to parse book.\nThese keys are missing from the header:\n";
+            for(var k:missingKeys){
+                ret = ret + "\n-" + k;
+            }
             t.sendResponseHeaders(400, ret.length());
             tmp.add(null);
             tmp.add(ret);
@@ -120,13 +145,48 @@ public class bookDB {
         tmp.add("");
         return tmp;
     }
-    public static String addBook(HttpExchange t)throws Exception{
+
+    public static String updateBook(int id, HttpExchange t)throws Exception{
+        int indexToReplace = -1;
+
+        {//delete book with bookID = id
+            boolean bookFound = false;
+            for(int i=0; !bookFound && i<books.size(); i++){
+                if(books.get(i).bookID == id){
+                    bookFound = true;
+                    indexToReplace = i;
+                    break;
+                }
+            }
+
+            if(!bookFound){
+                String ret = "Book not found";
+                t.sendResponseHeaders(404,ret.length());
+                return ret;
+            }
+        }
+
         book b;
-        String responseText;
         {
             List<Object> tmp = parseBook(t);
-            if(tmp.get(0) == null)return (String)tmp.get(1);
-            responseText = (String) tmp.get(1);
+            assert tmp.size() == 2 : " List.size() != 2";
+            if(!((String)tmp.get(1)).isEmpty()) return (String)tmp.get(1);
+            b = (book) tmp.get(0);
+            b.bookID = id;
+        }
+
+        String ret = "Old book:\n" + toJsonFormat(books.get(id)) + "\n\nReplaced with:\n";
+        books.set(indexToReplace, b);
+        ret = ret + toJsonFormat(books.get(id));
+        t.sendResponseHeaders(200, ret.length());
+        return ret;
+    }
+    public static String addBook(HttpExchange t)throws Exception{
+        book b;
+        {
+            List<Object> tmp = parseBook(t);
+            assert tmp.size() == 2 : " List.size() != 2";
+            if(!((String)tmp.get(1)).isEmpty()) return (String)tmp.get(1);
             b = (book) tmp.get(0);
         }
 

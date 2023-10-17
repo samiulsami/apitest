@@ -23,7 +23,6 @@ import com.sun.net.httpserver.*;
 public class Main {
 
     public static void main(String[] args)throws Exception {
-        ArrayList<String> xd = new ArrayList<String>(Arrays.asList(new String[]{"nfak","asdas"}));
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
         HttpContext _books = server.createContext("/bookstore/books", new bookHandler());
@@ -107,7 +106,7 @@ public class Main {
                 os.write(response.getBytes());
                 os.close();
             }
-            /*else if("PUT".equals(t.getRequestMethod())){
+            else if("PUT".equals(t.getRequestMethod())){
                 String response;
                 int id = getSuffix(t.getRequestURI().toString());
 
@@ -120,7 +119,7 @@ public class Main {
                 OutputStream os = t.getResponseBody();
                 os.write(response.getBytes());
                 os.close();
-            }*/
+            }
             else{
                 t.sendResponseHeaders(405,-1);
             }
