@@ -149,7 +149,7 @@ public class bookDB {
     public static String updateBook(int id, HttpExchange t)throws Exception{
         int indexToReplace = -1;
 
-        {//delete book with bookID = id
+        {//Find index of book with bookID = id
             boolean bookFound = false;
             for(int i=0; !bookFound && i<books.size(); i++){
                 if(books.get(i).bookID == id){
@@ -167,7 +167,7 @@ public class bookDB {
         }
 
         book b;
-        {
+        {//Replace book
             List<Object> tmp = parseBook(t);
             assert tmp.size() == 2 : " List.size() != 2";
             if(!((String)tmp.get(1)).isEmpty()) return (String)tmp.get(1);
