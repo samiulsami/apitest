@@ -95,8 +95,8 @@ public class bookDB {
         String ret;
         for(var i:books){
             if(i.bookID != bookID)continue;
+            ret = "The following book has been successfully deleted:\n\n" + toJsonFormat(i);
             books.remove(i);
-            ret = "Book: " + i.title + ", ID: " + bookID + " has been successfully deleted";
             t.sendResponseHeaders(200, ret.length());
             //serializeBooks();
             return ret;
@@ -191,7 +191,7 @@ public class bookDB {
         }
 
         books.add(b);
-        String ret = "Book: " + b.title + ", ID: " + b.bookID + " has been successfully added";
+        String ret = "The following book has been successfully added:\n\n" + toJsonFormat(b);
         t.sendResponseHeaders(200, ret.length());
         return ret;
     }

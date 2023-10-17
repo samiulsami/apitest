@@ -38,6 +38,9 @@ public class Main {
         server.start();
     }
 
+    ///Returns the integer at the end of an URI
+    ///e.g; getSuffix("http://localhost:8000/bookstore/books/4") returns 4
+    ///getSuffix("http://localhost:8000/bookstore/books/adasd") returns -1
     private static int getSuffix(String uri){
         String[] slist = uri.split("/",0);
         String tmp = slist[slist.length - 1];
@@ -54,74 +57,89 @@ public class Main {
     static class bookHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
-            if("GET".equals(t.getRequestMethod())) {
-                String response = null;
-                int id = getSuffix(t.getRequestURI().toString());
 
-                if(id < 0) {///Get all books
+            switch(t.getRequestMethod()){
+
+                case "GET": {
+                    String response = null;
+                    int id = getSuffix(t.getRequestURI().toString());
+
+                    if (id < 0) {///Get all books
+                        try {
+                            response = bookDB.getAllBooks(t);
+                        } catch (Exception e) {
+                            System.out.println("Error in GET: " + e);
+                            throw new RuntimeException(e);
+                        }
+                    } else {/// Get one book
+                        try {
+                            response = bookDB.getSingleBook(id, t);
+                        } catch (Exception e) {
+                            System.out.println("Error in GET: " + e);
+                            throw new RuntimeException(e);
+                        }
+                        // System.out.println(response);
+                    }
+                    OutputStream os = t.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                    break;
+                }
+                case "DELETE": {
+                    String response = null;
+                    int id = getSuffix(t.getRequestURI().toString());
+
+                    if(id==-1){
+                        response = "Invalid/Missing ID";
+                        t.sendResponseHeaders(400, response.length());
+                    }
+                    else {
+                        try {
+                            response = bookDB.deleteBook(id, t);
+                        } catch (Exception e) {
+                            System.out.println("Error in DELETE: " + e);
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    OutputStream os = t.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                    break;
+                }
+                case "POST": {
+                    String response;
+
                     try {
-                        response = bookDB.getAllBooks(t);
+                        response = bookDB.addBook(t);
                     } catch (Exception e) {
-                        System.out.println("Error in GET: " + e);
+                        System.out.println("Error in POST: " + e);
                         throw new RuntimeException(e);
                     }
+
+                    OutputStream os = t.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                    break;
                 }
-                else{/// Get one book
+                case "PUT": {
+                    String response;
+                    int id = getSuffix(t.getRequestURI().toString());
+
                     try {
-                        response = bookDB.getSingleBook(id, t);
+                        response = bookDB.updateBook(id, t);
                     } catch (Exception e) {
-                        System.out.println("Error in GET: " + e);
+                        System.out.println("Error in PUT: " + e);
                         throw new RuntimeException(e);
                     }
-                   // System.out.println(response);
-                }
-                OutputStream os = t.getResponseBody();
-                os.write(response.getBytes());
-                os.close();
-            }
-            else if("DELETE".equals(t.getRequestMethod())){
-                String response = null;
-                int id = getSuffix(t.getRequestURI().toString());
 
-                try {
-                    response = bookDB.deleteBook(id, t);
-                } catch (Exception e) {
-                    System.out.println("Error in DELETE: " + e);
-                    throw new RuntimeException(e);
+                    OutputStream os = t.getResponseBody();
+                    os.write(response.getBytes());
+                    os.close();
+                    break;
                 }
-
-                OutputStream os = t.getResponseBody();
-                os.write(response.getBytes());
-                os.close();
-            }
-            else if("POST".equals(t.getRequestMethod())){
-                String response;
-                try{
-                    response = bookDB.addBook(t);
-                }catch (Exception e){
-                    System.out.println("Error in POST: " + e);
-                    throw new RuntimeException(e);
-                }
-                OutputStream os = t.getResponseBody();
-                os.write(response.getBytes());
-                os.close();
-            }
-            else if("PUT".equals(t.getRequestMethod())){
-                String response;
-                int id = getSuffix(t.getRequestURI().toString());
-
-                try{
-                    response = bookDB.updateBook(id, t);
-                }catch (Exception e){
-                    System.out.println("Error in PUT: " + e);
-                    throw new RuntimeException(e);
-                }
-                OutputStream os = t.getResponseBody();
-                os.write(response.getBytes());
-                os.close();
-            }
-            else{
-                t.sendResponseHeaders(405,-1);
+                default:
+                    t.sendResponseHeaders(405, -1);
             }
             t.close();
         }
