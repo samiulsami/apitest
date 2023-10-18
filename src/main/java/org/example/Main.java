@@ -24,6 +24,7 @@ import com.sun.net.httpserver.*;
 public class Main {
     private static String my_username = "sami";
     private static String my_password = "1234";
+    private static final int TokenLifeSpanMinutes = 10;
 
     public static void main(String[] args)throws Exception {
 
@@ -59,9 +60,44 @@ public class Main {
         return num;
     }
 
+    private static boolean Authenticated(HttpExchange t)throws IOException{
+        boolean valid = true;
+        var keys = t.getRequestHeaders();
+        if(!keys.containsKey("Authorization"))valid = false;
+
+        if(valid){
+            try{
+                JWTtoken tmpToken = new JWTtoken(keys.get("Authorization").get(0));
+                valid = tmpToken.verify();
+                if(valid){
+                    long seconds = tmpToken.remainingSeconds();
+                    System.out.println("TOKEN VALIDITY: " + seconds/60 + " minutes and " + seconds%60 + " seconds remaining");
+                }
+            }catch (Exception e){
+                System.out.println("JWT token authentication error: " + e);
+                valid = false;
+            }
+        }
+
+        if(!valid){
+            String response = "This action is unauthorized\nPlease login first";
+            t.sendResponseHeaders(403,response.length());
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+            t.close();
+        }
+
+        return valid;
+    }
+
     static class bookHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
+
+            if(!Authenticated(t)) {
+                return;
+            }
 
             switch(t.getRequestMethod()){
                 case "GET": {
@@ -156,7 +192,7 @@ public class Main {
             String response = null;
             try{
                 String Base64EncodedCredentials = t.getRequestHeaders().get("Authorization").get(0).split(" ")[1];
-                JWTtoken tmp = new JWTtoken(Base64EncodedCredentials, 10);
+                JWTtoken tmp = new JWTtoken(Base64EncodedCredentials, TokenLifeSpanMinutes);
                 response = tmp.toString();
             } catch (Exception e) {
                 System.out.println("JWT token creation error: " + e);

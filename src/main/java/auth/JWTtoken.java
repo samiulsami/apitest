@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.spec.ECField;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -20,10 +21,13 @@ public class JWTtoken {
 
     public JWTtoken(String Base64EncodedCredentials, int MinutesTillExpiration) throws Exception {
         String username, password;
-        {
+        try{
             String[] decoded = decode(Base64EncodedCredentials).split(":");
             username = decoded[0];
             password = decoded[1];
+        }catch (Exception e){
+            System.out.println("Invalid/Missing credentials: " + e);
+            throw new RuntimeException();
         }
 
         payload = new JSONObject();
@@ -34,13 +38,26 @@ public class JWTtoken {
 
         encodedPayload = encode(payload.toString().getBytes(StandardCharsets.UTF_8));
         signature = HMACS256(encodedHeader + "." + encodedPayload);
-        //long remMinutes = (exp - LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))/60;
-        //System.out.println("Minutes remaining: " + remMinutes);
     }
 
-    public JWTtoken(String stringToken){
-        String tokenList[] = stringToken.split(".");
+    public JWTtoken(String stringToken)throws Exception{
+        String tokenList[] = stringToken.split("\\.");
+        if(tokenList.length!=3 || !encodedHeader.equals(tokenList[0])) {
+            throw new IllegalArgumentException("Provided token is invalid");
+        }
+        payload = new JSONObject(decode(tokenList[1]));
 
+        encodedPayload = encode(payload.toString().getBytes(StandardCharsets.UTF_8));
+        signature = tokenList[2];
+    }
+
+    public long remainingSeconds(){
+        return payload.getLong("expiry_time") - LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+    }
+
+    public boolean verify(){
+        if(!payload.has("expiry_time"))return false;
+        return (payload.getLong("expiry_time") > LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)) && (signature.equals(HMACS256(encodedHeader + "." + encodedPayload)));
     }
 
     public String toString(){
@@ -56,7 +73,7 @@ public class JWTtoken {
     }
 
     ///Reference: https://github.com/metamug/java-jwt/blob/master/src/main/java/com/metamug/jwt/JWebToken.java#L32
-    private String HMACS256(String data)throws Exception{
+    private String HMACS256(String data){
         try{
             byte[] hash = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
 
@@ -67,7 +84,7 @@ public class JWTtoken {
             return encode(sha256Hmac.doFinal(data.getBytes(StandardCharsets.UTF_8)));
         }catch (Exception e){
             System.out.println("HMACS256 error: " + e);
-            throw new RuntimeException();
+            return "";
         }
     }
 }
