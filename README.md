@@ -32,21 +32,7 @@ Download Java and Maven, and set up their path variables
 
 ## basic curl commands
 
-Get all users
-
-    curl -X GET --user heheh13:12345 http://localhost:8080/api/users
-
-Delete Specific user
-
-    curl -X DELETE --user heheh13:12345 http://localhost:8080/api/users/1
-
-Add a user
-
-    curl -X POST -d '{"id":"1","name":"Mehedi Hasan","skills":{"language":["c++,go"],"tools":["git","linux"],"endorsed":0}}' --user heheh13:12345 http://localhost:8080/api/users
-
-Update a user
-
-    curl -X PUT -d '{"name":"heheh"}' --user heheh13:12345 http://localhost:8080/api/users/1
+TODO
 
 ## References
 
