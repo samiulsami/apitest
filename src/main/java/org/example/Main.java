@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import auth.JWTtoken;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -21,24 +22,27 @@ import db.book;
 import com.sun.net.httpserver.*;
 
 public class Main {
+    private static String my_username = "sami";
+    private static String my_password = "1234";
 
     public static void main(String[] args)throws Exception {
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8000), 0);
         HttpContext _books = server.createContext("/bookstore/books", new bookHandler());
-      //  HttpContext _authors = server.createContext("/bookstore/authors", new authorHandler());
-       /* _books.setAuthenticator(new BasicAuthenticator("myrealm") {
+        HttpContext _login = server.createContext("/bookstore/login", new loginHandler());
+
+        _login.setAuthenticator(new BasicAuthenticator("myrealm") {
             @Override
             public boolean checkCredentials(String user, String pwd) {
-                return user.equals("admin") && pwd.equals("admin");
+                return user.equals(my_username) && pwd.equals(my_password);
             }
-        });*/
+        });
 
         server.setExecutor(null); // creates a default executor
         server.start();
     }
 
-    ///Returns the integer at the end of an URI
+    ///Returns the integer at the end of an URI. Returns -1 if it doesn't exist
     ///e.g; getSuffix("http://localhost:8000/bookstore/books/4") returns 4
     ///getSuffix("http://localhost:8000/bookstore/books/adasd") returns -1
     private static int getSuffix(String uri){
@@ -54,12 +58,12 @@ public class Main {
 
         return num;
     }
+
     static class bookHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
 
             switch(t.getRequestMethod()){
-
                 case "GET": {
                     String response = null;
                     int id = getSuffix(t.getRequestURI().toString());
@@ -145,25 +149,26 @@ public class Main {
         }
     }
 
-    static class authorHandler implements HttpHandler {
+    static class loginHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange t) throws IOException {
-            if("GET".equals(t.getRequestMethod())) {
-                //System.out.println(t.getRequestURI());
-                String response = null;
-                try {
-                    response = bookDB.getAllBooks(t);
-                } catch (Exception e) {
-                    System.out.println("Error: " + e);
-                    throw new RuntimeException(e);
-                }
-                OutputStream os = t.getResponseBody();
-                os.write(response.getBytes());
-                os.close();
+
+            String response = null;
+            try{
+                String Base64EncodedCredentials = t.getRequestHeaders().get("Authorization").get(0).split(" ")[1];
+                JWTtoken tmp = new JWTtoken(Base64EncodedCredentials, 10);
+                response = tmp.toString();
+            } catch (Exception e) {
+                System.out.println("JWT token creation error: " + e);
+                throw new RuntimeException(e);
             }
-            else{
-                t.sendResponseHeaders(405,-1);
-            }
+
+            t.sendResponseHeaders(200, response.length());
+
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
+
             t.close();
         }
     }
