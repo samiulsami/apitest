@@ -18,9 +18,10 @@ public class bookDB {
     public static ArrayList<book> books;
 
     static{
-        File file = new File("books.json");
-        ObjectMapper objectMapper = new ObjectMapper();
+        books = new ArrayList<book>();
         try {
+            File file = new File("books.json");
+            ObjectMapper objectMapper = new ObjectMapper();
             books = objectMapper.readValue(file, new TypeReference<ArrayList<book>>(){});
         } catch (IOException e) {
             System.out.print("db error: " + e);
@@ -29,7 +30,7 @@ public class bookDB {
 
     ///Writes the current elements of "books" into "books.json"
     private static void serializeBooks(){
-        if(books == null || books.isEmpty())return;
+        if(books.isEmpty())return;
         ObjectMapper mapper = new ObjectMapper();
         ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
         try {
@@ -47,7 +48,7 @@ public class bookDB {
         return ret+1;
     }
     public static String getAllBooks(HttpExchange t)throws Exception{
-        if(books == null || books.isEmpty()){
+        if(books.isEmpty()){
             String ret = "Database Empty";
             t.sendResponseHeaders(403,ret.length());
             return ret;
@@ -64,7 +65,7 @@ public class bookDB {
         return json;
     }
     public static String getSingleBook(int bookID)throws Exception{
-        if(books == null || books.isEmpty()){
+        if(books.isEmpty()){
             String ret = "Book not found";
             return ret;
         }
@@ -87,7 +88,7 @@ public class bookDB {
     }
 
     public static String deleteBook(int bookID, HttpExchange t)throws Exception{
-        if(books == null || books.isEmpty()){
+        if(books.isEmpty()){
             String ret = "Book not found";
             t.sendResponseHeaders(403,ret.length());
             return ret;
