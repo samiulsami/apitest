@@ -176,7 +176,7 @@ public class bookDB {
             b.bookID = id;
         }
 
-        String ret = "Old book:\n" + toJsonFormat(books.get(id)) + "\n\nReplaced with:\n";
+        String ret = "Old book:\n" + toJsonFormat(books.get(indexToReplace)) + "\n\nReplaced with:\n";
         books.set(indexToReplace, b);
         ret = ret + toJsonFormat(books.get(id));
         t.sendResponseHeaders(200, ret.length());

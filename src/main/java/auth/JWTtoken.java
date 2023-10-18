@@ -16,8 +16,8 @@ public class JWTtoken {
     private static final String JWT_HEADER = "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
     private static final String encodedHeader = encode(JWT_HEADER.getBytes(StandardCharsets.UTF_8));
     private final String encodedPayload;
-    private JSONObject payload;
-    private String signature;
+    private final JSONObject payload;
+    private final String signature;
 
     public JWTtoken(String Base64EncodedCredentials, int MinutesTillExpiration) throws Exception {
         String username, password;
