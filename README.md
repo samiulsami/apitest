@@ -21,7 +21,7 @@ Download Java and Maven, and set up their path variables
 
 |method|url|body|actions|
 |---|---|---|---|
-|GET|`https://localhost:8000/bookstore/login`||--header 'Authorization: Basic c2FtaToxMjM0'|returns a JWT token $TOKEN
+|GET|`https://localhost:8000/bookstore/login`|--header 'Authorization: Basic c2FtaToxMjM0'|returns a JWT token $TOKEN|
 |GET|`https://localhost:8000/bookstore/books`|--header 'Authorization: $TOKEN'|returns all books|
 |GET|`https://localhost:8000/bookstore/books/{id}`|--header 'Authorization: $TOKEN'|returns book with given id|
 |POST|`https://localhost:8000/bookstore/books`|--header 'title: $TITLE' ...| adds a book|
