@@ -30,7 +30,7 @@ Download Java and Maven, and set up their path variables
 
 ---
 
-## basic curl commands
+## Some cURL commands
 
 TODO
 
@@ -44,5 +44,5 @@ TODO
 TODO
 
 
-## make file
+## Make File
 TODO
