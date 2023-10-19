@@ -1,8 +1,3 @@
-
-# Project Title
-
-A brief description of what this project does and who it's for
-
 # Bookstore API server
 
 A simple bookstore API server written as an excersice for learning Java.
