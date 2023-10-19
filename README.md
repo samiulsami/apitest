@@ -38,38 +38,41 @@ Download Java and Maven, and set up their path variables
 ## Some cURL commands
 #### Login and receive a JWT $TOKEN (username: sami, password: 1234)
 ```
-    curl --location POST 'http://localhost:8000/bookstore/login' \ --header 'Authorization: Basic c2FtaToxMjM0'
+curl --location 'http://localhost:8000/bookstore/login' \
+--header 'Authorization: Basic c2FtaToxMjM0'
 ```
 #### Show all books
 ```
-    curl --location 'http://localhost:8000/bookstore/books' \--header 'Authorization: $TOKEN'
+curl --location 'http://localhost:8000/bookstore/books' \
+--header 'Authorization: $TOKEN'
 ```
 #### Show book with given {id}
 ```
-    curl --location 'http://localhost:8000/bookstore/books/{id}' \--header 'Authorization: $TOKEN'
+curl --location 'http://localhost:8000/bookstore/books/1' \
+--header 'Authorization: $TOKEN'
 ```
 #### Add book
 ```
-    curl --location --request POST 'http://localhost:8000/bookstore/books' \
-    --header 'title: d12312' \
-    --header 'authorName: askdj' \
-    --header 'authorID: 123' \
-    --header 'pages: 111' \
-    --header 'Authorization: $TOKEN'
+curl --location --request POST 'http://localhost:8000/bookstore/books' \
+--header 'title: d12312' \
+--header 'authorName: askdj' \
+--header 'authorID: 123' \
+--header 'pages: 111' \
+--header 'Authorization: $TOKEN'
 ```
 #### Update book with given {id}
 ```
-    curl --location --request PUT 'http://localhost:8000/bookstore/books/7' \
-    --header 'title: updated book' \
-    --header 'authorName: George Orwell' \
-    --header 'pages: 140' \
-    --header 'authorID: 2' \
-    --header 'Authorization: $token'
+curl --location --request PUT 'http://localhost:8000/bookstore/books/7' \
+--header 'title: updated book' \
+--header 'authorName: George Orwell' \
+--header 'pages: 140' \
+--header 'authorID: 2' \
+--header 'Authorization: $TOKEN'
 ```
 #### Delete book with given {id}
 ```    
-    curl --location --request DELETE 'http://localhost:8000/bookstore/books/7' \
-    --header 'Authorization: $TOKEN'
+curl --location --request DELETE 'http://localhost:8000/bookstore/books/7' \
+--header 'Authorization: $TOKEN'
 ```
 ----
 
