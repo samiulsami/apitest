@@ -60,14 +60,26 @@ public class Main {
         return num;
     }
 
+    ///Returns the JWT token if a bearer tag is found
+    private static String validateAndGetToken(String s){
+        String slist[] = s.split(" ");
+        if(slist.length != 2 || !slist[0].equals("Bearer"))return "";
+        return slist[1];
+    }
+
     private static boolean Authenticated(HttpExchange t)throws IOException{
         boolean valid = true;
         var keys = t.getRequestHeaders();
         if(!keys.containsKey("Authorization"))valid = false;
 
+        String tokenString = "";
+        if(valid)
+            tokenString = validateAndGetToken(keys.get("Authorization").get(0));
+        if(tokenString.isEmpty())valid = false;
+
         if(valid){
             try{
-                JWTtoken tmpToken = new JWTtoken(keys.get("Authorization").get(0));
+                JWTtoken tmpToken = new JWTtoken(tokenString);
                 valid = tmpToken.verify();
                 if(valid){
                     long seconds = tmpToken.remainingSeconds();
@@ -80,7 +92,7 @@ public class Main {
         }
 
         if(!valid){
-            String response = "This action is unauthorized\nPlease login first";
+            String response = "This action is unauthorized\nAuthorization token missing/expired";
             t.sendResponseHeaders(403,response.length());
             OutputStream os = t.getResponseBody();
             os.write(response.getBytes());
