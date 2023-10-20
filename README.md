@@ -39,35 +39,35 @@ curl --location 'http://localhost:8000/bookstore/login' \
 #### Show all books
 ```
 curl --location 'http://localhost:8000/bookstore/books' \
---header 'Authorization: $TOKEN'
+--header 'Authorization: Bearer $TOKEN'
 ```
 #### Show book with given {id}
 ```
 curl --location 'http://localhost:8000/bookstore/books/1' \
---header 'Authorization: $TOKEN'
+--header 'Authorization: Bearer $TOKEN'
 ```
 #### Add book
 ```
 curl --location --request POST 'http://localhost:8000/bookstore/books' \
---header 'title: d12312' \
+--header 'title: dsad' \
 --header 'authorName: askdj' \
 --header 'authorID: 123' \
 --header 'pages: 111' \
---header 'Authorization: $TOKEN'
+--header 'Authorization: Bearer $TOKEN'
 ```
 #### Update book with given {id}
 ```
-curl --location --request PUT 'http://localhost:8000/bookstore/books/7' \
---header 'title: updated book' \
+curl --location --request PUT 'http://localhost:8000/bookstore/books/6' \
+--header 'title: Cat Cafe' \
 --header 'authorName: George Orwell' \
 --header 'pages: 140' \
 --header 'authorID: 2' \
---header 'Authorization: $TOKEN'
+--header 'Authorization: Bearer $TOKEN'
 ```
 #### Delete book with given {id}
 ```    
-curl --location --request DELETE 'http://localhost:8000/bookstore/books/7' \
---header 'Authorization: $TOKEN'
+curl --location --request DELETE 'http://localhost:8000/bookstore/books/5' \
+--header 'Authorization: Bearer $TOKEN'
 ```
 ----
 
