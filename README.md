@@ -81,9 +81,17 @@ curl --location --request DELETE 'http://localhost:8000/bookstore/books/5' \
 - https://github.com/AbdullahAlShaad/bookstore-api-server
 
 
-## Docker
+## Build and run Docker image
 
-TODO
+`docker build -t <name:tag> .`
+
+`docker run -p <port:8000> <name:tag>`
+
+#### Example:
+`docker build -t apitest:1.0 .`
+
+`docker run -p 8000:8000 apitest123:1.0`
+
 
 
 ## Make File
