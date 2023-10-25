@@ -79,6 +79,7 @@ curl --location --request DELETE 'http://localhost:8000/bookstore/books/5' \
 - https://github.com/heheh13/api-server
 - https://github.com/MobarakHsn/api-server/tree/master
 - https://github.com/AbdullahAlShaad/bookstore-api-server
+- https://codefresh.io/blog/java_docker_pipeline/
 
 
 ## Build and run Docker image
@@ -90,7 +91,7 @@ curl --location --request DELETE 'http://localhost:8000/bookstore/books/5' \
 #### Example:
 `docker build -t apitest:1.0 .`
 
-`docker run -p 8000:8000 apitest123:1.0`
+`docker run -p 8000:8000 apitest:1.0`
 
 
 
