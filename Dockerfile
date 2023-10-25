@@ -1,6 +1,9 @@
-FROM maven:3.9.5
+FROM maven:3.9.5-eclipse-temurin-21-alpine
 COPY . ./apps
-WORKDIR /apps
+COPY ./pom.xml ./apps
+COPY ./books.json ./apps
+COPY ./META-INF ./apps
+WORKDIR ./apps
 
 RUN mvn install
 #RUN mvn package
