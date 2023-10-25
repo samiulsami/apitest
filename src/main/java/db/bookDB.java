@@ -20,7 +20,7 @@ public class bookDB {
     static{
         books = new ArrayList<book>();
         try {
-            File file = new File("books.json");
+            File file = new File("src/books.json");
             ObjectMapper objectMapper = new ObjectMapper();
             books = objectMapper.readValue(file, new TypeReference<ArrayList<book>>(){});
         } catch (IOException e) {
