@@ -82,18 +82,11 @@ curl --location --request DELETE 'http://localhost:8000/bookstore/books/5' \
 - https://codefresh.io/blog/java_docker_pipeline/
 
 
-## Build and run Docker image
+## Download and run Docker Image
 
-`docker build -t <name:tag> .`
+`docker pull sami7786/apitest:1.0`
 
-`docker run -p <port:8000> <name:tag>`
-
-#### Example:
-`docker build -t apitest:1.0 .`
-
-`docker run -p 8000:8000 apitest:1.0`
-
-
+`docker run -p 8000:8000 sami7786/apitest:1.0`
 
 ## Make File
 TODO
