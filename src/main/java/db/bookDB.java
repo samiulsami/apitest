@@ -34,7 +34,7 @@ public class bookDB {
         ObjectMapper mapper = new ObjectMapper();
         ObjectWriter writer = mapper.writer(new DefaultPrettyPrinter());
         try {
-            writer.writeValue(new File("books.json"), books);
+            writer.writeValue(new File("src/books.json"), books);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
