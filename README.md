@@ -85,6 +85,9 @@ curl --location --request DELETE 'http://localhost:8000/bookstore/books/5' \
 ## Download and run Docker Image
 
 `docker pull sami7786/apitest:1.0`
+####OR
+`docker build -t sami7786/apitest:1.0 .`
+
 
 `docker run -p 8000:8000 sami7786/apitest:1.0`
 
