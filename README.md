@@ -80,6 +80,7 @@ curl --location --request DELETE 'http://localhost:8000/bookstore/books/5' \
 - https://github.com/MobarakHsn/api-server/tree/master
 - https://github.com/AbdullahAlShaad/bookstore-api-server
 - https://codefresh.io/blog/java_docker_pipeline/
+- https://stackoverflow.com/questions/2022032/building-a-runnable-jar-with-maven-2
 
 
 ## Download and run Docker Image
