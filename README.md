@@ -21,10 +21,10 @@ Download Java and Maven, and set up their path variables
 
 |method|url|body|actions|
 |---|---|---|---|
-|GET|`https://localhost:8000/bookstore/login`|--header 'Authorization: Basic c2FtaToxMjM0'|returns a JWT token $TOKEN|
-|GET|`https://localhost:8000/bookstore/books`|--header 'Authorization: Bearer $TOKEN'|returns all books|
-|GET|`https://localhost:8000/bookstore/books/{id}`|--header 'Authorization: Bearer $TOKEN'|returns book with given id|
-|POST|`https://localhost:8000/bookstore/books`|  given below| adds a book|
+|GET|`http://localhost:8000/bookstore/login`|--header 'Authorization: Basic c2FtaToxMjM0'|returns a JWT token $TOKEN|
+|GET|`http://localhost:8000/bookstore/books`|--header 'Authorization: Bearer $TOKEN'|returns all books|
+|GET|`http://localhost:8000/bookstore/books/{id}`|--header 'Authorization: Bearer $TOKEN'|returns book with given id|
+|POST|`http://localhost:8000/bookstore/books`|  given below| adds a book|
 |PUT|`http://localhost:8000/bookstore/books/{id}`| given below|updates book with given id|
 |DELETE|`http://localhost:8000/bookstore/books/{id}`|--header 'Authorization: Bearer $TOKEN'|deletes book with given id|
 
